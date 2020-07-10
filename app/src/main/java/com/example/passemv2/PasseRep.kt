@@ -1,16 +1,12 @@
 package com.example.passemv2
 
 import androidx.lifecycle.LiveData
+class WordRepository(private val PasseDao: WordDao) {
 
-// Declares the DAO as a private property in the constructor. Pass in the DAO
-// instead of the whole database, because you only need access to the DAO
-class WordRepository(private val wordDao: WordDao) {
 
-    // Room executes all queries on a separate thread.
-    // Observed LiveData will notify the observer when the data has changed.
-    val allWords: LiveData<List<Word>> = wordDao.getAlphabetizedWords()
+    val allWords: LiveData<List<Word>> = PasseDao.getAlphabetizedWords()
 
     suspend fun insert(word: Word) {
-        wordDao.insert(word)
+        PasseDao.insert(word)
     }
 }
