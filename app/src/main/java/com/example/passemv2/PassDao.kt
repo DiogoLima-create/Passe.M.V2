@@ -1,7 +1,7 @@
 package com.example.passemv2
 
 import androidx.lifecycle.LiveData
-import androidx.room.Dao //classe DAO para Room
+import androidx.room.Dao //class DAO para Room
 import androidx.room.Insert
 import androidx.room.OnConflictStrategy
 import androidx.room.Query
