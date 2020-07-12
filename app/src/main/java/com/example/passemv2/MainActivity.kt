@@ -4,6 +4,7 @@ import android.app.Activity
 import android.content.Intent
 import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
+import android.provider.SyncStateContract.Helpers.insert
 import android.widget.Toast
 import androidx.lifecycle.Observer
 import androidx.lifecycle.ViewModelProvider
@@ -13,7 +14,7 @@ import com.google.android.material.floatingactionbutton.FloatingActionButton
 
 class MainActivity : AppCompatActivity() {
 
-     private val newWordActivityRequestCode = 1
+    private val newWordActivityRequestCode = 1
     private lateinit var wordViewModel: PassViewModel
 
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -24,9 +25,10 @@ class MainActivity : AppCompatActivity() {
         val adapter = PassListAdapter(this)
         recyclerView.adapter = adapter
         recyclerView.layoutManager = LinearLayoutManager(this)
-        wordViewModel = ViewModelProvider(this).get(PassViewModel::class.java)
 
+        wordViewModel = ViewModelProvider(this).get(PassViewModel::class.java)
         wordViewModel.allWords.observe(this, Observer { words ->
+            // Update the cached copy of the words in the adapter.
             words?.let { adapter.setWords(it) }
         })
 
@@ -37,21 +39,19 @@ class MainActivity : AppCompatActivity() {
         }
     }
 
-    override fun onActivityResult(requestCode: Int, resultCode: Int, intentData: Intent?) {
-        super.onActivityResult(requestCode, resultCode, intentData)
+    override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
+        super.onActivityResult(requestCode, resultCode, data)
 
         if (requestCode == newWordActivityRequestCode && resultCode == Activity.RESULT_OK) {
-            intentData?.let { data ->
-                val PassW = Word(data.getStringExtra(New_Pass_Activity.EXTRA_REPLY))
-                wordViewModel.insert(PassW)
-                Unit
+            data?.getStringExtra(New_Pass_Activity.EXTRA_REPLY)?.let {
+                val word = Word(it)
+                wordViewModel.insert(word)
             }
         } else {
             Toast.makeText(
                 applicationContext,
                 R.string.empty_not_saved,
-                Toast.LENGTH_LONG
-            ).show()
+                Toast.LENGTH_LONG).show()
         }
     }
 }
